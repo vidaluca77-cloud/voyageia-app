@@ -3,346 +3,455 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voyageia - Assistant IA de Voyage</title>
+    <title>VoyageIA - Décrivez vos vacances, l'IA s'occupe du reste</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            min-height: 100vh; color: white;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+        .hero { text-align: center; padding: 4rem 0; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); font-weight: 700; }
+        .hero .subtitle { font-size: 1.3rem; margin-bottom: 3rem; opacity: 0.9; font-weight: 300; }
+        .prompt-container { 
+            background: white; padding: 3rem; border-radius: 20px; margin: 3rem 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); color: #333;
         }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 2rem;
-            text-align: center;
+        .prompt-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; text-align: center; }
+        .prompt-input { 
+            width: 100%; min-height: 120px; padding: 20px; font-size: 1.1rem; 
+            border: 3px solid #e0e7ff; border-radius: 15px; margin-bottom: 2rem;
+            font-family: inherit; resize: vertical; transition: all 0.3s;
         }
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+        .prompt-input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1); }
+        .analyze-btn { 
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white; 
+            padding: 18px 40px; border: none; border-radius: 15px; font-size: 1.2rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; display: block; margin: 0 auto;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .analyze-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4); }
+        .examples { margin-top: 2rem; }
+        .examples h3 { text-align: center; font-size: 1.1rem; margin-bottom: 1rem; color: #666; }
+        .examples-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .example-btn { 
+            background: rgba(102, 126, 234, 0.1); border: 2px solid rgba(102, 126, 234, 0.2);
+            padding: 15px; border-radius: 12px; cursor: pointer; transition: all 0.3s;
+            text-align: left; font-size: 0.95rem; color: #555;
         }
-        .ai-prompt-section {
-            padding: 3rem 2rem;
-            background: linear-gradient(135deg, #f8f9ff 0%, #e8f0fe 100%);
-        }
-        .ai-prompt-title {
-            text-align: center;
-            color: #333;
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .ai-prompt-subtitle {
-            text-align: center;
-            color: #666;
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-        .prompt-container {
-            position: relative;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        .prompt-input {
-            width: 100%;
-            min-height: 150px;
-            padding: 25px;
-            border: 3px solid #e1e5e9;
-            border-radius: 20px;
-            font-size: 1.1rem;
-            font-family: inherit;
-            line-height: 1.6;
-            resize: vertical;
-            transition: all 0.3s ease;
-            background: white;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-        }
-        .prompt-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), 0 12px 30px rgba(0,0,0,0.1);
+        .example-btn:hover { 
+            background: rgba(102, 126, 234, 0.15); border-color: rgba(102, 126, 234, 0.4);
             transform: translateY(-2px);
         }
-        .prompt-input::placeholder {
-            color: #999;
-            font-style: italic;
+        .loading { 
+            display: none; text-align: center; padding: 3rem;
+            background: rgba(255,255,255,0.1); border-radius: 15px; margin: 2rem 0;
+            backdrop-filter: blur(10px);
         }
-        .magic-button {
-            position: absolute;
-            right: 15px;
-            bottom: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        .loading.active { display: block; }
+        .loading-spinner { 
+            width: 60px; height: 60px; border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white; border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 1rem;
         }
-        .magic-button:hover {
-            transform: scale(1.1) rotate(10deg);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .proposals { display: none; margin-top: 3rem; }
+        .proposals.active { display: block; }
+        .proposals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .proposal-card { 
+            background: white; border-radius: 20px; padding: 2rem; color: #333;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2); transition: all 0.3s;
         }
-        .examples {
-            margin-top: 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
+        .proposal-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .proposal-destination { font-size: 1.4rem; font-weight: 700; color: #667eea; }
+        .proposal-price { font-size: 1.3rem; font-weight: 700; color: #764ba2; }
+        .proposal-duration { color: #666; margin-bottom: 1rem; }
+        .highlight-tag { 
+            background: rgba(102, 126, 234, 0.1); color: #667eea;
+            padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem;
+            font-weight: 500; margin-right: 0.5rem; display: inline-block; margin-bottom: 0.5rem;
         }
-        .example-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 15px;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .proposal-details { background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; }
+        .detail-item { 
+            display: flex; justify-content: space-between; padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
         }
-        .example-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        .detail-item:last-child { border-bottom: none; }
+        .select-btn { 
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+            border: none; padding: 15px 30px; border-radius: 12px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; width: 100%; transition: all 0.3s;
         }
-        .example-card h4 {
-            color: #667eea;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-        }
-        .example-card p {
-            color: #666;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            padding: 2rem;
-            background: #f8f9fa;
-        }
-        .feature-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        .feature-card .icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        .feature-card h3 {
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-        .feature-card p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        .typing-indicator {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1rem;
-            color: #667eea;
-            font-weight: 600;
-        }
-        .typing-indicator.active {
-            display: flex;
-        }
-        .typing-dots {
-            display: inline-flex;
-            margin-left: 10px;
-        }
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #667eea;
-            margin: 0 2px;
-            animation: typing 1.4s infinite;
-        }
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.4;
-            }
-            30% {
-                transform: translateY(-10px);
-                opacity: 1;
-            }
-        }
+        .select-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3); }
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            .ai-prompt-title {
-                font-size: 1.5rem;
-            }
-            .prompt-input {
-                min-height: 120px;
-                padding: 20px;
-                font-size: 1rem;
-            }
-            .magic-button {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
+            .hero h1 { font-size: 2.5rem; }
+            .container { padding: 1rem; }
+            .prompt-container { padding: 2rem; }
+            .proposals-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🌍 Voyageia</h1>
-            <p>Votre assistant IA révolutionnaire pour des voyages sur mesure</p>
+        <div class="hero">
+            <h1>🌍 VoyageIA</h1>
+            <p class="subtitle">Décrivez vos vacances de rêve, l'IA s'occupe du reste</p>
         </div>
-        
-        <div class="ai-prompt-section">
-            <h2 class="ai-prompt-title">✨ Décrivez votre voyage rêvé</h2>
-            <p class="ai-prompt-subtitle">Exprimez-vous en langage naturel, notre IA comprend vos envies</p>
-            
-            <div class="prompt-container">
-                <textarea 
-                    id="travel-prompt" 
-                    class="prompt-input" 
-                    placeholder="Exemple : Je rêve d'un voyage romantique de 10 jours en Italie au printemps, avec un budget de 3000€ pour 2 personnes. J'aimerais découvrir la gastronomie locale, visiter des sites historiques et profiter de paysages magnifiques. Nous partons de Paris et préférons éviter les foules touristiques..."
-                ></textarea>
-                <button class="magic-button" id="generate-plan" title="Générer mon voyage avec l'IA">
-                    ✨
-                </button>
-            </div>
-            
-            <div class="typing-indicator" id="typing-indicator">
-                L'IA analyse votre demande
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            
+
+        <div class="prompt-container">
+            <h2 class="prompt-title">💬 Décrivez votre voyage idéal en quelques mots</h2>
+            <textarea 
+                class="prompt-input" 
+                id="travelPrompt"
+                placeholder="Exemple : Je veux partir 2 semaines en Asie du Sud-Est avec un budget de 1500€ par personne. J'aimerais découvrir des temples, profiter de belles plages et goûter la cuisine locale."
+            ></textarea>
+
+            <button class="analyze-btn" onclick="analyzePrompt()">
+                ✨ Analyser et Créer mon Voyage
+            </button>
+
             <div class="examples">
-                <div class="example-card" onclick="fillExample(this)">
-                    <h4>🏖️ Escapade tropicale</h4>
-                    <p>"Je veux 2 semaines aux Maldives en décembre, avec des activités nautiques et spa, budget 8000€ pour un couple"</p>
-                </div>
-                <div class="example-card" onclick="fillExample(this)">
-                    <h4>🎒 Aventure solo</h4>
-                    <p>"Voyage sac à dos de 3 semaines en Asie du Sud-Est, budget 2000€, je veux découvrir la culture locale et faire de la randonnée"</p>
-                </div>
-                <div class="example-card" onclick="fillExample(this)">
-                    <h4>👨‍👩‍👧‍👦 Vacances famille</h4>
-                    <p>"10 jours en été dans le sud de la France avec 2 enfants (8 et 12 ans), activités familiales, budget 4000€"</p>
-                </div>
-                <div class="example-card" onclick="fillExample(this)">
-                    <h4>🌸 Circuit culturel</h4>
-                    <p>"3 semaines au Japon pendant la floraison des cerisiers, découverte de la culture traditionnelle et moderne, budget flexible"</p>
+                <h3>💡 Ou cliquez sur un exemple :</h3>
+                <div class="examples-grid">
+                    <button class="example-btn" onclick="fillExample('Je veux partir 2 semaines en Asie avec 1500€ par personne, découvrir des temples et des plages')">
+                        🏝️ "2 semaines en Asie avec 1500€, temples et plages"
+                    </button>
+                    <button class="example-btn" onclick="fillExample('Voyage romantique en Europe, 10 jours, 2500€ pour 2, villes historiques et gastronomie')">
+                        💕 "Voyage romantique Europe, 10 jours, 2500€"
+                    </button>
+                    <button class="example-btn" onclick="fillExample('Aventure solo en Amérique du Sud, 3 semaines, budget 1200€, nature et culture')">
+                        🎒 "Aventure solo Amérique du Sud, 1200€"
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <div class="features">
-            <div class="feature-card">
-                <div class="icon">🤖</div>
-                <h3>IA Révolutionnaire</h3>
-                <p>Compréhension avancée du langage naturel pour des recommandations ultra-personnalisées</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">🎯</div>
-                <h3>Planification Intelligente</h3>
-                <p>Itinéraires optimisés selon vos préférences, budget et contraintes</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">✈️</div>
-                <h3>Réservation Intégrée</h3>
-                <p>Vols, hôtels et activités réservés automatiquement selon votre plan</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">💎</div>
-                <h3>Expériences Uniques</h3>
-                <p>Découvrez des activités authentiques et des lieux secrets</p>
-            </div>
+
+        <div class="loading" id="loadingDiv">
+            <div class="loading-spinner"></div>
+            <h3>🤖 L'IA analyse votre demande...</h3>
+            <p id="loadingText">Recherche des meilleures options pour vous</p>
+        </div>
+
+        <div class="proposals" id="proposalsDiv">
+            <h2 style="text-align: center; font-size: 2rem; margin-bottom: 1rem;">
+                ✨ Vos Propositions de Voyage Personnalisées
+            </h2>
+            <p style="text-align: center; opacity: 0.9; margin-bottom: 2rem;">
+                L'IA a analysé votre demande et créé ces voyages parfaits pour vous
+            </p>
+            <div class="proposals-grid" id="proposalsContainer"></div>
         </div>
     </div>
-    
+
     <script>
-        function fillExample(card) {
-            const exampleText = card.querySelector('p').textContent.replace(/^"/,'').replace(/"$/,'');
-            document.getElementById('travel-prompt').value = exampleText;
-            document.getElementById('travel-prompt').focus();
+        const destinations = [
+            {
+                nom: 'Thaïlande',
+                region: 'Asie du Sud-Est',
+                prix_base: 1200,
+                mots_cles: ['asie', 'temple', 'plage', 'cuisine', 'aventure', 'massage', 'bangkok', 'sud-est'],
+                points_forts: ['Temples bouddhistes', 'Plages paradisiaques', 'Street food', 'Massages thaï'],
+                description: 'Le parfait mélange entre spiritualité, détente et aventure'
+            },
+            {
+                nom: 'Vietnam',
+                region: 'Asie du Sud-Est',
+                prix_base: 900,
+                mots_cles: ['asie', 'culture', 'nature', 'budget', 'aventure', 'halong', 'saigon', 'sud-est'],
+                points_forts: ['Baie d\'Halong', 'Delta du Mékong', 'Cuisine authentique', 'Histoire riche'],
+                description: 'Découverte culturelle intense à petit budget'
+            },
+            {
+                nom: 'Grèce',
+                region: 'Europe du Sud',
+                prix_base: 1400,
+                mots_cles: ['europe', 'plage', 'histoire', 'romantique', 'île', 'santorini', 'mykonos'],
+                points_forts: ['Îles grecques', 'Sites antiques', 'Gastronomie méditerranéenne', 'Couchers de soleil'],
+                description: 'Romance et histoire au cœur de la Méditerranée'
+            },
+            {
+                nom: 'Pérou',
+                region: 'Amérique du Sud',
+                prix_base: 1600,
+                mots_cles: ['amérique', 'sud', 'aventure', 'culture', 'nature', 'machu', 'inca', 'trek'],
+                points_forts: ['Machu Picchu', 'Cusco colonial', 'Trek Inca', 'Culture andine'],
+                description: 'Aventure mystique sur les traces des Incas'
+            },
+            {
+                nom: 'Japon',
+                region: 'Asie de l\'Est',
+                prix_base: 2500,
+                mots_cles: ['japon', 'asie', 'culture', 'moderne', 'temple', 'tokyo', 'cerisier', 'gastronomie'],
+                points_forts: ['Temples zen', 'Technologie de pointe', 'Gastronomie raffinée', 'Nature préservée'],
+                description: 'Voyage fascinant entre tradition millénaire et modernité'
+            }
+        ];
+
+        function fillExample(text) {
+            document.getElementById('travelPrompt').value = text;
         }
-        
-        document.getElementById('generate-plan').addEventListener('click', function() {
-            const prompt = document.getElementById('travel-prompt').value.trim();
-            
+
+        function analyzePrompt() {
+            const prompt = document.getElementById('travelPrompt').value.trim();
+
             if (!prompt) {
-                alert('Veuillez décrire votre voyage rêvé pour que notre IA puisse vous aider !');
+                alert('🤖 Veuillez décrire votre voyage de rêve pour que l\'IA puisse vous aider !');
                 return;
             }
-            
-            // Animation de l'indicateur de frappe
-            const typingIndicator = document.getElementById('typing-indicator');
-            typingIndicator.classList.add('active');
-            
-            // Simulation du traitement IA
+
+            // Afficher le loading
+            document.getElementById('loadingDiv').classList.add('active');
+            document.getElementById('proposalsDiv').classList.remove('active');
+
+            // Messages de loading évolutifs
+            const loadingSteps = [
+                'Analyse de vos préférences de voyage...',
+                'Recherche des meilleures destinations...',
+                'Calcul des budgets optimaux...',
+                'Optimisation des itinéraires...',
+                'Génération de vos propositions personnalisées...'
+            ];
+
+            let stepIndex = 0;
+            const loadingInterval = setInterval(() => {
+                document.getElementById('loadingText').textContent = loadingSteps[stepIndex];
+                stepIndex = (stepIndex + 1) % loadingSteps.length;
+            }, 800);
+
+            // Simuler l'analyse IA
             setTimeout(() => {
-                typingIndicator.classList.remove('active');
-                alert(`🎉 Fantastique ! Notre IA a analysé votre demande :\n\n"${prompt}"\n\nVotre plan de voyage personnalisé est en cours de génération. Cette fonctionnalité sera bientôt disponible !`);
-            }, 3000);
-        });
-        
-        // Auto-resize du textarea
-        document.getElementById('travel-prompt').addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.max(150, this.scrollHeight) + 'px';
-        });
-        
-        // Animation d'entrée
-        document.addEventListener('DOMContentLoaded', function() {
-            const promptContainer = document.querySelector('.prompt-container');
-            promptContainer.style.opacity = '0';
-            promptContainer.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                promptContainer.style.transition = 'all 0.8s ease';
-                promptContainer.style.opacity = '1';
-                promptContainer.style.transform = 'translateY(0)';
-            }, 300);
-        });
+                clearInterval(loadingInterval);
+                const propositions = analyzePromptWithIA(prompt);
+                displayPropositions(propositions);
+            }, 4000);
+        }
+
+        function analyzePromptWithIA(prompt) {
+            console.log('🤖 Analyse IA du prompt:', prompt);
+
+            const promptLower = prompt.toLowerCase();
+
+            // Extraction intelligente
+            const analysis = {
+                budget: extractBudget(prompt),
+                duree: extractDuration(prompt),
+                personnes: extractPersonnes(prompt),
+                styles: extractStyles(promptLower)
+            };
+
+            console.log('📊 Analyse extraite:', analysis);
+
+            // Scoring intelligent des destinations
+            const scores = destinations.map(dest => {
+                let score = 0;
+
+                // Score basé sur les mots-clés
+                dest.mots_cles.forEach(motCle => {
+                    if (promptLower.includes(motCle)) {
+                        score += 3;
+                    }
+                });
+
+                // Score basé sur le budget
+                const budgetDiff = Math.abs(dest.prix_base - analysis.budget);
+                score += Math.max(0, 10 - (budgetDiff / 200));
+
+                // Bonus pour correspondance de style
+                analysis.styles.forEach(style => {
+                    if (dest.mots_cles.includes(style)) {
+                        score += 4;
+                    }
+                });
+
+                return { ...dest, score };
+            });
+
+            // Sélectionner les 3 meilleures destinations
+            const topDestinations = scores
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3);
+
+            // Générer les propositions détaillées
+            return topDestinations.map((dest, index) => {
+                const variation = index === 0 ? 1.0 : index === 1 ? 0.9 : 0.8;
+                const budgetAjuste = Math.round(analysis.budget * variation);
+
+                return generateDetailedProposal(dest, budgetAjuste, analysis);
+            });
+        }
+
+        function extractBudget(prompt) {
+            const patterns = [
+                /budget.*?(\d+).*?€/i,
+                /(\d+).*?€.*?budget/i,
+                /(\d+)\s*€/i,
+                /(\d+)\s*euros?/i
+            ];
+
+            for (let pattern of patterns) {
+                const match = prompt.match(pattern);
+                if (match) {
+                    return parseInt(match[1]);
+                }
+            }
+
+            return 1500; // Budget par défaut
+        }
+
+        function extractDuration(prompt) {
+            const patterns = [
+                /(\d+)\s*semaines?/i,
+                /(\d+)\s*jours?/i,
+                /(\d+)\s*mois/i
+            ];
+
+            for (let pattern of patterns) {
+                const match = prompt.match(pattern);
+                if (match) {
+                    const num = parseInt(match[1]);
+                    if (pattern.source.includes('semaine')) return num * 7;
+                    if (pattern.source.includes('mois')) return num * 30;
+                    return num;
+                }
+            }
+
+            return 14; // 2 semaines par défaut
+        }
+
+        function extractPersonnes(prompt) {
+            const patterns = [
+                /(\d+)\s*personnes?/i,
+                /pour\s*(\d+)/i
+            ];
+
+            for (let pattern of patterns) {
+                const match = prompt.match(pattern);
+                if (match) {
+                    return parseInt(match[1]);
+                }
+            }
+
+            // Détection contextuelle
+            if (prompt.toLowerCase().includes('couple') || prompt.toLowerCase().includes('romantique')) return 2;
+            if (prompt.toLowerCase().includes('famille')) return 4;
+            if (prompt.toLowerCase().includes('solo')) return 1;
+
+            return 2; // Couple par défaut
+        }
+
+        function extractStyles(promptLower) {
+            const styles = [];
+
+            if (promptLower.includes('aventure') || promptLower.includes('trek') || promptLower.includes('randonnée')) {
+                styles.push('aventure');
+            }
+            if (promptLower.includes('culture') || promptLower.includes('temple') || promptLower.includes('musée') || promptLower.includes('histoire')) {
+                styles.push('culture');
+            }
+            if (promptLower.includes('plage') || promptLower.includes('mer') || promptLower.includes('soleil')) {
+                styles.push('plage');
+            }
+            if (promptLower.includes('romantique') || promptLower.includes('couple') || promptLower.includes('amoureux')) {
+                styles.push('romantique');
+            }
+            if (promptLower.includes('détente') || promptLower.includes('spa') || promptLower.includes('relaxation')) {
+                styles.push('détente');
+            }
+            if (promptLower.includes('gastronomie') || promptLower.includes('cuisine') || promptLower.includes('restaurant')) {
+                styles.push('gastronomie');
+            }
+            if (promptLower.includes('nature') || promptLower.includes('paysage') || promptLower.includes('montagne')) {
+                styles.push('nature');
+            }
+
+            return styles;
+        }
+
+        function generateDetailedProposal(destination, budget, analysis) {
+            const repartition = {
+                vols: Math.round(budget * 0.35),
+                hebergement: Math.round(budget * 0.30),
+                activites: Math.round(budget * 0.15),
+                repas: Math.round(budget * 0.15),
+                transport: Math.round(budget * 0.05)
+            };
+
+            return {
+                destination: destination.nom,
+                region: destination.region,
+                duration: analysis.duree + ' jours',
+                totalPrice: budget,
+                highlights: destination.points_forts,
+                description: destination.description,
+                ...repartition
+            };
+        }
+
+        function displayPropositions(propositions) {
+            document.getElementById('loadingDiv').classList.remove('active');
+            document.getElementById('proposalsDiv').classList.add('active');
+
+            const container = document.getElementById('proposalsContainer');
+
+            container.innerHTML = propositions.map((prop) => `
+                <div class="proposal-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+                        <div>
+                            <div class="proposal-destination">${prop.destination}</div>
+                            <div class="proposal-duration">${prop.duration} • ${prop.region}</div>
+                        </div>
+                        <div class="proposal-price">${prop.totalPrice}€</div>
+                    </div>
+
+                    <p style="color: #666; font-style: italic; margin-bottom: 1rem;">
+                        ${prop.description}
+                    </p>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        ${prop.highlights.map(h => `<span class="highlight-tag">${h}</span>`).join('')}
+                    </div>
+
+                    <div class="proposal-details">
+                        <div class="detail-item">
+                            <span>✈️ Vols aller-retour</span>
+                            <span>${prop.vols}€</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🏨 Hébergement complet</span>
+                            <span>${prop.hebergement}€</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🎯 Activités & Visites</span>
+                            <span>${prop.activites}€</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🍽️ Repas & Gastronomie</span>
+                            <span>${prop.repas}€</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>🚗 Transport local</span>
+                            <span>${prop.transport}€</span>
+                        </div>
+                    </div>
+
+                    <button class="select-btn" onclick="selectProposal('${prop.destination}', ${prop.totalPrice})">
+                        🎉 Réserver ce Voyage
+                    </button>
+                </div>
+            `).join('');
+
+            // Scroll automatique vers les résultats
+            document.getElementById('proposalsDiv').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        function selectProposal(destination, price) {
+            alert(`🎉 Voyage Sélectionné !\n\n${destination} - ${price}€\n\nVotre voyage est en cours de réservation automatique...\n\n(Mode démo - réservation simulée)`);
+        }
     </script>
 </body>
 </html>

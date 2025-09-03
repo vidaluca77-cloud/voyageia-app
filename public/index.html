@@ -3,110 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voyageia - Planificateur de Voyages IA</title>
+    <title>Voyageia - Assistant IA de Voyage</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 2rem;
             text-align: center;
         }
-
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
         }
-
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
         }
-
-        .search-form {
-            padding: 2rem;
+        .ai-prompt-section {
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f0fe 100%);
         }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-col {
-            flex: 1;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
+        .ai-prompt-title {
+            text-align: center;
             color: #333;
-            font-weight: 600;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        input[type="text"],
-        input[type="date"],
-        input[type="number"],
-        select {
+        .ai-prompt-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        .prompt-container {
+            position: relative;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .prompt-input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 1rem;
+            min-height: 150px;
+            padding: 25px;
+            border: 3px solid #e1e5e9;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            line-height: 1.6;
+            resize: vertical;
             transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
         }
-
-        input:focus,
-        select:focus {
+        .prompt-input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15), 0 12px 30px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
-
-        .search-btn {
-            width: 100%;
+        .prompt-input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        .magic-button {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 1.2rem;
-            font-weight: 600;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 1rem;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        .magic-button:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
-
+        .examples {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .example-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .example-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        .example-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .example-card p {
+            color: #666;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -114,7 +142,6 @@
             padding: 2rem;
             background: #f8f9fa;
         }
-
         .feature-card {
             background: white;
             padding: 1.5rem;
@@ -123,33 +150,76 @@
             text-align: center;
             transition: transform 0.3s ease;
         }
-
         .feature-card:hover {
             transform: translateY(-5px);
         }
-
         .feature-card .icon {
             font-size: 2.5rem;
             margin-bottom: 1rem;
         }
-
         .feature-card h3 {
             color: #333;
             margin-bottom: 0.5rem;
         }
-
         .feature-card p {
             color: #666;
             font-size: 0.9rem;
         }
-
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+        .typing-indicator.active {
+            display: flex;
+        }
+        .typing-dots {
+            display: inline-flex;
+            margin-left: 10px;
+        }
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
             }
-            
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
+            }
+            .ai-prompt-title {
+                font-size: 1.5rem;
+            }
+            .prompt-input {
+                min-height: 120px;
+                padding: 20px;
+                font-size: 1rem;
+            }
+            .magic-button {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -158,117 +228,120 @@
     <div class="container">
         <div class="header">
             <h1>🌍 Voyageia</h1>
-            <p>Votre assistant intelligent pour la planification de voyages personnalisés</p>
+            <p>Votre assistant IA révolutionnaire pour des voyages sur mesure</p>
         </div>
         
-        <div class="search-form">
-            <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Planifiez votre voyage idéal</h2>
+        <div class="ai-prompt-section">
+            <h2 class="ai-prompt-title">✨ Décrivez votre voyage rêvé</h2>
+            <p class="ai-prompt-subtitle">Exprimez-vous en langage naturel, notre IA comprend vos envies</p>
             
-            <form>
-                <div class="form-row">
-                    <div class="form-col">
-                        <label for="departure">Ville de départ</label>
-                        <input type="text" id="departure" name="departure" placeholder="Paris, France" required>
-                    </div>
-                    <div class="form-col">
-                        <label for="destination">Destination</label>
-                        <input type="text" id="destination" name="destination" placeholder="Tokyo, Japon" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-col">
-                        <label for="departure-date">Date de départ</label>
-                        <input type="date" id="departure-date" name="departure-date" required>
-                    </div>
-                    <div class="form-col">
-                        <label for="return-date">Date de retour</label>
-                        <input type="date" id="return-date" name="return-date">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-col">
-                        <label for="travelers">Nombre de voyageurs</label>
-                        <select id="travelers" name="travelers">
-                            <option value="1">1 voyageur</option>
-                            <option value="2" selected>2 voyageurs</option>
-                            <option value="3">3 voyageurs</option>
-                            <option value="4">4 voyageurs</option>
-                            <option value="5+">5+ voyageurs</option>
-                        </select>
-                    </div>
-                    <div class="form-col">
-                        <label for="budget">Budget approximatif (€)</label>
-                        <select id="budget" name="budget">
-                            <option value="500-1000">500 - 1,000 €</option>
-                            <option value="1000-2500" selected>1,000 - 2,500 €</option>
-                            <option value="2500-5000">2,500 - 5,000 €</option>
-                            <option value="5000+">5,000+ €</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="travel-type">Type de voyage</label>
-                    <select id="travel-type" name="travel-type">
-                        <option value="adventure">Aventure</option>
-                        <option value="relaxation" selected>Détente</option>
-                        <option value="cultural">Culturel</option>
-                        <option value="business">Affaires</option>
-                        <option value="family">Famille</option>
-                        <option value="romantic">Romantique</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="search-btn">
-                    🔍 Planifier mon voyage avec l'IA
+            <div class="prompt-container">
+                <textarea 
+                    id="travel-prompt" 
+                    class="prompt-input" 
+                    placeholder="Exemple : Je rêve d'un voyage romantique de 10 jours en Italie au printemps, avec un budget de 3000€ pour 2 personnes. J'aimerais découvrir la gastronomie locale, visiter des sites historiques et profiter de paysages magnifiques. Nous partons de Paris et préférons éviter les foules touristiques..."
+                ></textarea>
+                <button class="magic-button" id="generate-plan" title="Générer mon voyage avec l'IA">
+                    ✨
                 </button>
-            </form>
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                L'IA analyse votre demande
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            
+            <div class="examples">
+                <div class="example-card" onclick="fillExample(this)">
+                    <h4>🏖️ Escapade tropicale</h4>
+                    <p>"Je veux 2 semaines aux Maldives en décembre, avec des activités nautiques et spa, budget 8000€ pour un couple"</p>
+                </div>
+                <div class="example-card" onclick="fillExample(this)">
+                    <h4>🎒 Aventure solo</h4>
+                    <p>"Voyage sac à dos de 3 semaines en Asie du Sud-Est, budget 2000€, je veux découvrir la culture locale et faire de la randonnée"</p>
+                </div>
+                <div class="example-card" onclick="fillExample(this)">
+                    <h4>👨‍👩‍👧‍👦 Vacances famille</h4>
+                    <p>"10 jours en été dans le sud de la France avec 2 enfants (8 et 12 ans), activités familiales, budget 4000€"</p>
+                </div>
+                <div class="example-card" onclick="fillExample(this)">
+                    <h4>🌸 Circuit culturel</h4>
+                    <p>"3 semaines au Japon pendant la floraison des cerisiers, découverte de la culture traditionnelle et moderne, budget flexible"</p>
+                </div>
+            </div>
         </div>
         
         <div class="features">
             <div class="feature-card">
                 <div class="icon">🤖</div>
-                <h3>IA Avancée</h3>
-                <p>Recommandations personnalisées basées sur vos préférences</p>
+                <h3>IA Révolutionnaire</h3>
+                <p>Compréhension avancée du langage naturel pour des recommandations ultra-personnalisées</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🎯</div>
+                <h3>Planification Intelligente</h3>
+                <p>Itinéraires optimisés selon vos préférences, budget et contraintes</p>
             </div>
             <div class="feature-card">
                 <div class="icon">✈️</div>
                 <h3>Réservation Intégrée</h3>
-                <p>Vols, hôtels et activités en un seul endroit</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">📱</div>
-                <h3>Suivi Temps Réel</h3>
-                <p>Notifications et mises à jour durant votre voyage</p>
+                <p>Vols, hôtels et activités réservés automatiquement selon votre plan</p>
             </div>
             <div class="feature-card">
                 <div class="icon">💎</div>
                 <h3>Expériences Uniques</h3>
-                <p>Découvrez des activités authentiques et exclusives</p>
+                <p>Découvrez des activités authentiques et des lieux secrets</p>
             </div>
         </div>
     </div>
     
     <script>
-        // Initialisation des dates par défaut
+        function fillExample(card) {
+            const exampleText = card.querySelector('p').textContent.replace(/^"/,'').replace(/"$/,'');
+            document.getElementById('travel-prompt').value = exampleText;
+            document.getElementById('travel-prompt').focus();
+        }
+        
+        document.getElementById('generate-plan').addEventListener('click', function() {
+            const prompt = document.getElementById('travel-prompt').value.trim();
+            
+            if (!prompt) {
+                alert('Veuillez décrire votre voyage rêvé pour que notre IA puisse vous aider !');
+                return;
+            }
+            
+            // Animation de l'indicateur de frappe
+            const typingIndicator = document.getElementById('typing-indicator');
+            typingIndicator.classList.add('active');
+            
+            // Simulation du traitement IA
+            setTimeout(() => {
+                typingIndicator.classList.remove('active');
+                alert(`🎉 Fantastique ! Notre IA a analysé votre demande :\n\n"${prompt}"\n\nVotre plan de voyage personnalisé est en cours de génération. Cette fonctionnalité sera bientôt disponible !`);
+            }, 3000);
+        });
+        
+        // Auto-resize du textarea
+        document.getElementById('travel-prompt').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(150, this.scrollHeight) + 'px';
+        });
+        
+        // Animation d'entrée
         document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            const promptContainer = document.querySelector('.prompt-container');
+            promptContainer.style.opacity = '0';
+            promptContainer.style.transform = 'translateY(20px)';
             
-            const nextWeek = new Date(today);
-            nextWeek.setDate(nextWeek.getDate() + 7);
-            
-            document.getElementById('departure-date').value = tomorrow.toISOString().split('T')[0];
-            document.getElementById('return-date').value = nextWeek.toISOString().split('T')[0];
-            
-            // Gestion du formulaire
-            document.querySelector('form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Fonctionnalité en développement! Votre recherche sera bientôt traitée par notre IA.');
-            });
+            setTimeout(() => {
+                promptContainer.style.transition = 'all 0.8s ease';
+                promptContainer.style.opacity = '1';
+                promptContainer.style.transform = 'translateY(0)';
+            }, 300);
         });
     </script>
 </body>
